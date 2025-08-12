@@ -107,7 +107,6 @@ public class InventoryService {
             User currentUser = userRepository.findByEmail(
                     SecurityContextHolder.getContext().getAuthentication().getName()
             );
-
             transactionService.makeTransaction(
                     item,
                     Type.REMOVE,

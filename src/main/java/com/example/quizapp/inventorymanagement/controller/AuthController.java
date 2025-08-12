@@ -51,10 +51,4 @@ public class AuthController {
         return authService.loginVerify(request);
     }
 
-
-    @GetMapping("/hello")
-    public String hello1(){
-
-        return "Hello its working ";
-    }
 }

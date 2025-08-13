@@ -21,4 +21,5 @@ public class InventoryItems {
     private String supplierName;
     private String supplierContact;
     private String lowStockThreshold;
+    private boolean active = true;
 }

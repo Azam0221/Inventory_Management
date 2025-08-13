@@ -17,13 +17,14 @@ public class TransactionService{
     @Autowired
     private TransactionRepository transactionRepo;
 
-    public void makeTransaction(InventoryItems inventoryItems, Type type, int quantityChange, User user,String remakrs){
+    public void makeTransaction(InventoryItems inventoryItems, Type type, int quantityChange, User user,String remarks){
         Transaction tx = new Transaction();
         tx.setInventoryItems(inventoryItems);
         tx.setType(type);
         tx.setQuantityChange(quantityChange);
         tx.setUser(user);
         tx.setTimeStamp(LocalDateTime.now());
+        tx.setRemarks(remarks);
 
         transactionRepo.save(tx);
     }

@@ -43,7 +43,9 @@ public class InventoryService {
                     Type.ADD,
                     items.getQuantity(),
                     currentUser,
-                    "Inventory Item ADDED sku_code $sku_code category $category by user $currentUser.name"
+                    "Inventory Item ADDED sku_code " + sku_code +
+                            " category " + category +
+                            " by user " + currentUser.getName()
             );
         }
 
@@ -52,7 +54,7 @@ public class InventoryService {
 
     public ResponseEntity<List<InventoryItems>> getInventoryItems(){
         try {
-            return  new ResponseEntity<>(inventoryItemRepo.findAll(), HttpStatus.OK);
+            return  new ResponseEntity<>(inventoryItemRepo.findByActive(true), HttpStatus.OK);
         }
         catch (Exception e){
             e.printStackTrace();
@@ -85,7 +87,9 @@ public class InventoryService {
                         Type.ADD,
                         inventoryItems.getQuantity(),
                         currentUser,
-                        "Inventory Item UPDATED sku_code $sku_code category $category by user $currentUser.name"
+                        "Inventory Item UPDATED sku_code " + sku_code +
+                                " category " + category +
+                                " by user " + currentUser.getName()
                 );
             return new ResponseEntity<>(inventoryItemRepo.save(existingItem),HttpStatus.OK);
         }
@@ -102,17 +106,20 @@ public class InventoryService {
             InventoryItems item = inventoryItemRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
 
-
-            inventoryItemRepo.deleteById(id);
+            item.setActive(false);
             User currentUser = userRepository.findByEmail(
                     SecurityContextHolder.getContext().getAuthentication().getName()
             );
+            String sku_code = item.getSku_code();
+            String category = item.getCategory();
             transactionService.makeTransaction(
                     item,
                     Type.REMOVE,
                     -item.getQuantity(),
                     currentUser,
-                    "Inventory Item REMOVED sku_code $sku_code category $category by user $currentUser.name"
+                    "Inventory Item INACTIVE sku_code " + sku_code +
+                            " category " + category +
+                            " by user " + currentUser.getName()
             );
 
             return  new ResponseEntity<>("Item deleted ", HttpStatus.OK);

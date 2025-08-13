@@ -33,8 +33,8 @@ public class InventoryItemsController {
 
     @PutMapping("update/{id}")
     public ResponseEntity<InventoryItems> updateItem(@PathVariable int id ,@RequestBody InventoryItems inventoryItems){
-        inventoryService.updateItem(id,inventoryItems);
-                return new ResponseEntity<>(inventoryItems,HttpStatus.OK);
+       return inventoryService.updateItem(id,inventoryItems);
+
     }
 
     @DeleteMapping("delete/{id}")

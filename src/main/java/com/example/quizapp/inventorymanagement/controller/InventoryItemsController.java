@@ -42,4 +42,9 @@ public class InventoryItemsController {
         return inventoryService.deleteItem(id);
     }
 
+    @GetMapping("getLowStock")
+    public ResponseEntity<List<InventoryItems>> getLowStockItems(){
+        return inventoryService.getLowStockItems();
+    }
+
 }

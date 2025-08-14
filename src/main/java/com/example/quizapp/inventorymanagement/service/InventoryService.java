@@ -129,4 +129,14 @@ public class InventoryService {
         }
        return  new ResponseEntity<>("Failed", HttpStatus.BAD_REQUEST);
     }
+
+    public ResponseEntity<List<InventoryItems>> getLowStockItems(){
+        try {
+            return  new ResponseEntity<>(inventoryItemRepo.findLowStockItems(), HttpStatus.OK);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        } return  new ResponseEntity<>( new ArrayList<InventoryItems>(), HttpStatus.BAD_REQUEST);
+    }
+
 }

@@ -16,10 +16,10 @@ public class InventoryItems {
     private String name;
     private String category;
     private String description;
-    private int quantity;
+    private int quantity; 
     private double price;
     private String supplierName;
     private String supplierContact;
-    private String lowStockThreshold;
+    private int lowStockThreshold;
     private boolean active = true;
 }

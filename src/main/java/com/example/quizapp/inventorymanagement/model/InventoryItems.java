@@ -19,7 +19,7 @@ public class InventoryItems {
     private int quantity; 
     private double price;
     private String supplierName;
-    private String supplierContact;
+    private String supplierContact; 
     private int lowStockThreshold;
     private boolean active = true;
 }

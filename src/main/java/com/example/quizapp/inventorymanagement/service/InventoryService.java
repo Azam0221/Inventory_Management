@@ -3,10 +3,15 @@ package com.example.quizapp.inventorymanagement.service;
 
 import com.example.quizapp.inventorymanagement.enum_.Type;
 import com.example.quizapp.inventorymanagement.model.InventoryItems;
+import com.example.quizapp.inventorymanagement.model.StockAdjustmentRequest;
 import com.example.quizapp.inventorymanagement.model.User;
 import com.example.quizapp.inventorymanagement.repository.InventoryItemRepository;
 import com.example.quizapp.inventorymanagement.repository.UserRepository;
+import com.example.quizapp.inventorymanagement.specification.InventorySpecification;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -61,9 +66,9 @@ public class InventoryService {
         } return  new ResponseEntity<>( new ArrayList<InventoryItems>(), HttpStatus.BAD_REQUEST);
     }
 
+
     public ResponseEntity<InventoryItems> updateItem(long id,InventoryItems inventoryItems){
         try{
-
             InventoryItems existingItem = inventoryItemRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
             existingItem.setId(inventoryItems.getId());
@@ -103,13 +108,9 @@ public class InventoryService {
 
     public ResponseEntity<String> deleteItem(long id) {
         try {
-            InventoryItems item = inventoryItemRepo.findById(id)
-                    .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
-
+            InventoryItems item = inventoryItemRepo.findById(id).orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
             item.setActive(false);
-            User currentUser = userRepository.findByEmail(
-                    SecurityContextHolder.getContext().getAuthentication().getName()
-            );
+            User currentUser = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             String sku_code = item.getSku_code();
             String category = item.getCategory();
             transactionService.makeTransaction(
@@ -119,9 +120,7 @@ public class InventoryService {
                     currentUser,
                     "Inventory Item INACTIVE sku_code " + sku_code +
                             " category " + category +
-                            " by user " + currentUser.getName()
-            );
-
+                            " by user " + currentUser.getName());
             return  new ResponseEntity<>("Item deleted ", HttpStatus.OK);
         }
         catch (Exception e){
@@ -130,6 +129,7 @@ public class InventoryService {
        return  new ResponseEntity<>("Failed", HttpStatus.BAD_REQUEST);
     }
 
+
     public ResponseEntity<List<InventoryItems>> getLowStockItems(){
         try {
             return  new ResponseEntity<>(inventoryItemRepo.findLowStockItems(), HttpStatus.OK);
@@ -137,6 +137,43 @@ public class InventoryService {
         catch (Exception e){
             e.printStackTrace();
         } return  new ResponseEntity<>( new ArrayList<InventoryItems>(), HttpStatus.BAD_REQUEST);
+    }
+
+    public Page<InventoryItems> searchItems(String name, String sku_code,String category,String supplier_name,int page, int size){
+        Specification<InventoryItems>  spec = Specification
+                .allOf(InventorySpecification.hasName(name),
+                InventorySpecification.hasCategory(category),
+                InventorySpecification.hasSku(sku_code),
+                InventorySpecification.hasSupplier(supplier_name));
+
+        return inventoryItemRepo.findAll(spec, PageRequest.of(page,size));
+    }
+
+    public ResponseEntity<String> adjustStock(Long id,StockAdjustmentRequest request){
+
+        InventoryItems inventoryItems = inventoryItemRepo.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item not found"));
+        int newQuantity = request.getAdjustment()+inventoryItems.getQuantity();
+
+        if(newQuantity<0){
+            ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid adjustment");
+        }
+
+        User currentUser = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+
+        inventoryItems.setQuantity(newQuantity);
+        transactionService.makeTransaction(
+                inventoryItems,
+                Type.ADJUSTMENT,
+                request.getAdjustment(),
+                currentUser,
+                "Inventory Item ADJUSTMENT : Why? " +  request.getRemarks() +   " sku_code: " + inventoryItems.getSku_code() +
+                        " category: " + inventoryItems.getCategory() +
+                        " by user: " + currentUser.getName());
+        inventoryItemRepo.save(inventoryItems);
+
+        return ResponseEntity.ok("Stock adjusted successfully");
+
     }
 
 }

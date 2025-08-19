@@ -1,9 +1,6 @@
 package com.example.quizapp.inventorymanagement.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
@@ -13,13 +10,16 @@ public class InventoryItems {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
     private String sku_code;
-    private String name;
-    private String category;
-    private String description;
     private int quantity; 
     private double price;
-    private String supplierName;
-    private String supplierContact; 
     private int lowStockThreshold;
     private boolean active = true;
+
+    @ManyToOne
+    @JoinColumn(name = "product_id")
+    private Product product;
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id")
+    private Supplier supplier;
 }

@@ -4,8 +4,10 @@ package com.example.quizapp.inventorymanagement.service;
 import com.example.quizapp.inventorymanagement.enum_.Type;
 import com.example.quizapp.inventorymanagement.model.InventoryItems;
 import com.example.quizapp.inventorymanagement.model.StockAdjustmentRequest;
+import com.example.quizapp.inventorymanagement.model.Supplier;
 import com.example.quizapp.inventorymanagement.model.User;
 import com.example.quizapp.inventorymanagement.repository.InventoryItemRepository;
+import com.example.quizapp.inventorymanagement.repository.ProductRepository;
 import com.example.quizapp.inventorymanagement.repository.UserRepository;
 import com.example.quizapp.inventorymanagement.specification.InventorySpecification;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,9 @@ public class InventoryService {
     @Autowired
     TransactionService transactionService;
 
+    @Autowired
+    ProductRepository productRepo;
+
 
     public void addInventoryItems(List<InventoryItems> inventoryItemsList){
         inventoryItemRepo.saveAll(inventoryItemsList);
@@ -42,7 +47,8 @@ public class InventoryService {
 
         for(InventoryItems items : inventoryItemsList){
             String sku_code = items.getSku_code();
-            String category = items.getCategory();
+            String category = items.getProduct().getCategory();
+            Supplier supplier = items.getSupplier();
             transactionService.makeTransaction(
                     items,
                     Type.ADD,
@@ -50,7 +56,9 @@ public class InventoryService {
                     currentUser,
                     "Inventory Item ADDED sku_code " + sku_code +
                             " category " + category +
-                            " by user " + currentUser.getName()
+                            " by user " + currentUser.getName(),
+                    supplier
+
             );
         }
 
@@ -72,21 +80,17 @@ public class InventoryService {
             InventoryItems existingItem = inventoryItemRepo.findById(id)
                     .orElseThrow(() -> new RuntimeException("Item not found with id: " + id));
             existingItem.setId(inventoryItems.getId());
-            existingItem.setName(inventoryItems.getName());
             existingItem.setPrice(inventoryItems.getPrice());
             existingItem.setQuantity(inventoryItems.getQuantity());
-            existingItem.setCategory(inventoryItems.getCategory());
-            existingItem.setDescription(inventoryItems.getDescription());
             existingItem.setSku_code(inventoryItems.getSku_code());
             existingItem.setLowStockThreshold(inventoryItems.getLowStockThreshold());
-            existingItem.setSupplierName(inventoryItems.getSupplierName());
-            existingItem.setSupplierContact(inventoryItems.getSupplierContact());
 
             User currentUser = userRepository.findByEmail(
                     SecurityContextHolder.getContext().getAuthentication().getName());
 
                 String sku_code = inventoryItems.getSku_code();
-                String category = inventoryItems.getCategory();
+                String category = inventoryItems.getProduct().getCategory();
+                Supplier supplier = inventoryItems.getSupplier();
                 transactionService.makeTransaction(
                         inventoryItems,
                         Type.ADD,
@@ -94,7 +98,9 @@ public class InventoryService {
                         currentUser,
                         "Inventory Item UPDATED sku_code " + sku_code +
                                 " category " + category +
-                                " by user " + currentUser.getName()
+                                " by user " + currentUser.getName(),
+                        supplier
+
                 );
             return new ResponseEntity<>(inventoryItemRepo.save(existingItem),HttpStatus.OK);
         }
@@ -112,7 +118,8 @@ public class InventoryService {
             item.setActive(false);
             User currentUser = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
             String sku_code = item.getSku_code();
-            String category = item.getCategory();
+            String category = item.getProduct().getCategory();
+            Supplier supplier = item.getSupplier();
             transactionService.makeTransaction(
                     item,
                     Type.REMOVE,
@@ -120,7 +127,8 @@ public class InventoryService {
                     currentUser,
                     "Inventory Item INACTIVE sku_code " + sku_code +
                             " category " + category +
-                            " by user " + currentUser.getName());
+                            " by user " + currentUser.getName(),
+                    supplier);
             return  new ResponseEntity<>("Item deleted ", HttpStatus.OK);
         }
         catch (Exception e){
@@ -160,7 +168,7 @@ public class InventoryService {
         }
 
         User currentUser = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
-
+        Supplier supplier = new Supplier();
         inventoryItems.setQuantity(newQuantity);
         transactionService.makeTransaction(
                 inventoryItems,
@@ -168,8 +176,9 @@ public class InventoryService {
                 request.getAdjustment(),
                 currentUser,
                 "Inventory Item ADJUSTMENT : Why? " +  request.getRemarks() +   " sku_code: " + inventoryItems.getSku_code() +
-                        " category: " + inventoryItems.getCategory() +
-                        " by user: " + currentUser.getName());
+                        " category: " + inventoryItems.getProduct().getCategory() +
+                        " by user: " + currentUser.getName(),
+                supplier);
         inventoryItemRepo.save(inventoryItems);
 
         return ResponseEntity.ok("Stock adjusted successfully");

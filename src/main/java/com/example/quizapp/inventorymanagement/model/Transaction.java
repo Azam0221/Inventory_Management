@@ -18,12 +18,19 @@ public class Transaction {
     @ManyToOne
     private InventoryItems inventoryItems;
 
+    @Enumerated(EnumType.STRING)
     private Type type;
+
     private int quantityChange;
     private LocalDateTime timeStamp;
 
     @ManyToOne
     private User user;
+
+
+    @ManyToOne
+    @JoinColumn(name = "supplier_id",nullable = true)
+    private Supplier supplier;
 
     private String remarks;
 

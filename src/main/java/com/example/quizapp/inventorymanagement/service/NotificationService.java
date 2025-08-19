@@ -18,12 +18,13 @@ public class NotificationService {
         this.mailSender = mailSender;
     }
 
+
     public void sendLowStockAlert(List<InventoryItems> items){
         String subject = "Low Stock Alert";
         StringBuilder body = new StringBuilder("The following items are low in stock:\n\n");
 
         for(InventoryItems item: items){
-            body.append(item.getName())
+            body.append(item.getProduct().getName())
                     .append(" SKU ").append(item.getSku_code())
                     .append(") - Qty:").append(item.getQuantity())
                     .append("\n");

@@ -3,6 +3,7 @@ package com.example.quizapp.inventorymanagement.service;
 
 import com.example.quizapp.inventorymanagement.enum_.Type;
 import com.example.quizapp.inventorymanagement.model.InventoryItems;
+import com.example.quizapp.inventorymanagement.model.Supplier;
 import com.example.quizapp.inventorymanagement.model.Transaction;
 import com.example.quizapp.inventorymanagement.model.User;
 import com.example.quizapp.inventorymanagement.repository.TransactionRepository;
@@ -17,7 +18,7 @@ public class TransactionService{
     @Autowired
     private TransactionRepository transactionRepo;
 
-    public void makeTransaction(InventoryItems inventoryItems, Type type, int quantityChange, User user,String remarks){
+    public void makeTransaction(InventoryItems inventoryItems, Type type, int quantityChange, User user, String remarks, Supplier supplier){
         Transaction tx = new Transaction();
         tx.setInventoryItems(inventoryItems);
         tx.setType(type);
@@ -25,6 +26,7 @@ public class TransactionService{
         tx.setUser(user);
         tx.setTimeStamp(LocalDateTime.now());
         tx.setRemarks(remarks);
+        tx.setSupplier(supplier);
 
         transactionRepo.save(tx);
     }

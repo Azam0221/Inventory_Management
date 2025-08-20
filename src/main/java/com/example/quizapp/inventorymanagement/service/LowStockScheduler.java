@@ -27,7 +27,7 @@ public class LowStockScheduler {
     public void checkAndNotifyLowStock(){
         List<InventoryItems> lowStockItems = inventoryService.getLowStockItems().getBody();
         assert lowStockItems != null;
-        if(!lowStockItems.isEmpty()){
+        if(!lowStockItems.isEmpty()){ 
            notificationService.sendLowStockAlert(lowStockItems);
        }
     }

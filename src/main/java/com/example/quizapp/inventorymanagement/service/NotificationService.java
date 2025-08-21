@@ -1,8 +1,15 @@
 package com.example.quizapp.inventorymanagement.service;
 
+import com.example.quizapp.inventorymanagement.enum_.Role;
 import com.example.quizapp.inventorymanagement.model.InventoryItems;
+import com.example.quizapp.inventorymanagement.model.NotificationRule;
+import com.example.quizapp.inventorymanagement.model.User;
+import com.example.quizapp.inventorymanagement.repository.NotificationRuleRepository;
+import com.example.quizapp.inventorymanagement.repository.ResponsibilityRepository;
+import com.example.quizapp.inventorymanagement.repository.UserRepository;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -12,11 +19,56 @@ public class NotificationService {
 
 
     private final JavaMailSender mailSender;
+    private UserRepository userRepo;
+    private ResponsibilityRepository responsibilityRepo;
+    private NotificationRuleRepository notificationRuleRepo;
 
 
-    public NotificationService(JavaMailSender mailSender) {
+    public NotificationService(JavaMailSender mailSender,
+                               UserRepository userRepository,
+                               ResponsibilityRepository responsibilityRepository,
+                               NotificationRuleRepository notificationRuleRepository) {
         this.mailSender = mailSender;
+        this.userRepo = userRepository;
+        this.notificationRuleRepo = notificationRuleRepository;
+        this.responsibilityRepo = responsibilityRepository;
     }
+
+    public void notifyEvent(String eventType, String condition,String messageBody) {
+        List<NotificationRule> rules = notificationRuleRepo.findByEventType(eventType);
+
+        for (NotificationRule rule : rules) {
+
+            List<User> targets = resolveTargets(rule);
+            for(User user: targets){
+                if(rule.getChannels().contains("Email")){
+                    sendMail(user.getEmail(),eventType,messageBody);
+                }
+                else{
+                    System.out.println("SMS not yet implemented");
+                }
+            }
+        }
+    }
+
+        public List<User> resolveTargets(NotificationRule rule){
+        switch (rule.getTargetType()){
+            case USER:
+                return userRepo.findById((long) Integer.parseInt(rule.getTargetValue()))
+                        .map(List::of).orElse(List.of());
+            case ROLE:
+                return userRepo.findByRole(Role.valueOf(rule.getTargetValue()));
+
+            case RESPONSIBILITY:
+                return responsibilityRepo.findByName(rule.getTargetValue())
+                        .map(res -> userRepo.findByResponsibilitiesContaining(res))
+                        .orElse(List.of());
+            default:
+                return List.of();
+        }
+        }
+
+
 
 
     public void sendLowStockAlert(List<InventoryItems> items){

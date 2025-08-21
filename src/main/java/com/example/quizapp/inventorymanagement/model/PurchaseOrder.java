@@ -3,6 +3,7 @@ package com.example.quizapp.inventorymanagement.model;
 
 import com.example.quizapp.inventorymanagement.enum_.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.time.LocalDateTime;
@@ -16,6 +17,7 @@ public class PurchaseOrder {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
+    @NotBlank
     @ManyToOne
     private Supplier supplier;
 

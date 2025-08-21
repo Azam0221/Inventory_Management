@@ -5,6 +5,7 @@ import com.example.quizapp.inventorymanagement.enum_.Role;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -29,7 +30,7 @@ public class User {
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "user_responsibility",
        joinColumns = @JoinColumn(name = "user_id"),
-       inverseJoinColumns = @JoinColumn(name = "responsibilty_id")
+       inverseJoinColumns = @JoinColumn(name = "responsibility_id")
     )
     private Set<Responsibility> responsibilities;
 }

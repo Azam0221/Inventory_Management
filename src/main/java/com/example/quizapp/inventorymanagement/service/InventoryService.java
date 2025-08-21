@@ -2,10 +2,7 @@ package com.example.quizapp.inventorymanagement.service;
 
 
 import com.example.quizapp.inventorymanagement.enum_.Type;
-import com.example.quizapp.inventorymanagement.model.InventoryItems;
-import com.example.quizapp.inventorymanagement.model.StockAdjustmentRequest;
-import com.example.quizapp.inventorymanagement.model.Supplier;
-import com.example.quizapp.inventorymanagement.model.User;
+import com.example.quizapp.inventorymanagement.model.*;
 import com.example.quizapp.inventorymanagement.repository.InventoryItemRepository;
 import com.example.quizapp.inventorymanagement.repository.ProductRepository;
 import com.example.quizapp.inventorymanagement.repository.UserRepository;
@@ -184,5 +181,44 @@ public class InventoryService {
         return ResponseEntity.ok("Stock adjusted successfully");
 
     }
+
+    public ResponseEntity<String> increaseStock(Product product , int quantity,Supplier supplier){
+
+        InventoryItems item = inventoryItemRepo.findByProductAndSupplier(product,supplier);
+        int prevQuantity = item.getQuantity();
+        if(item!=null){
+            item.setQuantity(prevQuantity +quantity);
+            item.setSupplier(supplier);
+        }
+        else{
+            return new ResponseEntity<String>("Item not found",HttpStatus.BAD_REQUEST);
+        }
+
+        inventoryItemRepo.save(item);
+        return new ResponseEntity<String>(item+"Quantity has been increased",HttpStatus.OK);
+
+    }
+
+    public ResponseEntity<String> decreaseStock(Product product , int quantity){
+
+        InventoryItems item = inventoryItemRepo.findByProduct(product);
+        int prevQuantity = item.getQuantity();
+        if(item!=null){
+            item.setQuantity(prevQuantity - quantity);
+        }
+
+        else if(prevQuantity < quantity) {
+                return new ResponseEntity<>("Insufficient stock", HttpStatus.BAD_REQUEST);
+            }
+
+        else{
+            return new ResponseEntity<String>("Item not found",HttpStatus.BAD_REQUEST);
+        }
+
+        inventoryItemRepo.save(item);
+        return new ResponseEntity<String>(item+"Quantity has been increased",HttpStatus.OK);
+
+    }
+
 
 }

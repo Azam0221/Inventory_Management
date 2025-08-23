@@ -68,9 +68,6 @@ public class NotificationService {
         }
         }
 
-
-
-
     public void sendLowStockAlert(List<InventoryItems> items){
         String subject = "Low Stock Alert";
         StringBuilder body = new StringBuilder("The following items are low in stock:\n\n");

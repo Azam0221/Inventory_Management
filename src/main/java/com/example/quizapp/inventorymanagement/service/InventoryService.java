@@ -35,6 +35,9 @@ public class InventoryService {
     @Autowired
     ProductRepository productRepo;
 
+    @Autowired
+    NotificationService notificationService;
+
 
     public void addInventoryItems(List<InventoryItems> inventoryItemsList){
         inventoryItemRepo.saveAll(inventoryItemsList);
@@ -208,7 +211,8 @@ public class InventoryService {
         }
 
         else if(prevQuantity < quantity) {
-                return new ResponseEntity<>("Insufficient stock", HttpStatus.BAD_REQUEST);
+            notificationService.sendLowStockAlert((List<InventoryItems>) item);
+            return new ResponseEntity<>("Insufficient stock", HttpStatus.BAD_REQUEST);
             }
 
         else{

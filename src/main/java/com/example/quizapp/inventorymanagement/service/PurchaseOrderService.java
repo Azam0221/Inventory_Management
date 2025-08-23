@@ -6,9 +6,11 @@ import com.example.quizapp.inventorymanagement.enum_.Type;
 import com.example.quizapp.inventorymanagement.model.*;
 import com.example.quizapp.inventorymanagement.repository.InventoryItemRepository;
 import com.example.quizapp.inventorymanagement.repository.PurchaseOrderRepository;
+import com.example.quizapp.inventorymanagement.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -22,6 +24,7 @@ public class PurchaseOrderService {
     private final InventoryService inventoryService;
     private final TransactionService transactionService;
     private final InventoryItemRepository inventoryItemRepo;
+    private final UserRepository userRepository;
 
     public ResponseEntity<String> createPo(Supplier supplier, List<PurchaseOrderItem> items){
         if(supplier == null || items == null || items.isEmpty()){
@@ -44,17 +47,19 @@ public class PurchaseOrderService {
         return ResponseEntity.ok("Purchase order approved successfully");
     }
 
-    public ResponseEntity<String> receivePo(Long poId, User user){
+    public ResponseEntity<String> receivePo(Long poId){
         PurchaseOrder po = poRepo.findById(poId).get();
         if( po.getStatus() != Status.APPROVED){
             return new ResponseEntity<>("Purchase order is not approved", HttpStatus.BAD_REQUEST);
         }
 
+        User currentUser = userRepository.findByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
+
         po.setStatus(Status.RECEIVED);
         for(PurchaseOrderItem item: po.getPurchaseOrderItems()){
             InventoryItems inventoryItems = inventoryItemRepo.findByProduct(item.getProduct());
             inventoryService.increaseStock(item.getProduct(),item.getQuantity(),po.getSupplier());
-            transactionService.makeTransaction(inventoryItems, Type.ADD,item.getQuantity(),user,"#PO",po.getSupplier());
+            transactionService.makeTransaction(inventoryItems, Type.ADD,item.getQuantity(),currentUser,"#PO",po.getSupplier());
         }
         poRepo.save(po);
 

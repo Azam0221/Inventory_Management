@@ -18,6 +18,7 @@ public class SalesOrderController {
 
     private final SalesOrderService salesOrderService;
 
+
     @PostMapping("create")
     public ResponseEntity<String> createSO(@RequestBody SalesOrderRequest request){
         return salesOrderService.createSo(request.getCustomerName(),request.getSalesOrderItems());

@@ -19,6 +19,7 @@ public class InventoryItemsController {
     @Autowired
     InventoryService inventoryService;
 
+
     @PostMapping("add")
     public ResponseEntity<String> addItems(@RequestBody List<InventoryItems> inventoryItem){
         inventoryService.addInventoryItems(inventoryItem);

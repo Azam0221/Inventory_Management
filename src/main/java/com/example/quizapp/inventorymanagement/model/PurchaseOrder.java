@@ -17,7 +17,7 @@ public class PurchaseOrder {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private int id;
 
-    @NotBlank
+
     @ManyToOne
     private Supplier supplier;
 

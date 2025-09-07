@@ -7,6 +7,7 @@ import com.example.quizapp.inventorymanagement.repository.InventoryItemRepositor
 import com.example.quizapp.inventorymanagement.repository.ProductRepository;
 import com.example.quizapp.inventorymanagement.repository.UserRepository;
 import com.example.quizapp.inventorymanagement.specification.InventorySpecification;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -202,7 +203,7 @@ public class InventoryService {
 
     }
 
-    public ResponseEntity<String> decreaseStock(Product product , int quantity){
+    public ResponseEntity<String> decreaseStock(Product product , int quantity)  {
 
         InventoryItems item = inventoryItemRepo.findByProduct(product);
         int prevQuantity = item.getQuantity();
@@ -211,9 +212,15 @@ public class InventoryService {
         }
 
         else if(prevQuantity < quantity) {
-            notificationService.sendLowStockAlert((List<InventoryItems>) item);
-            return new ResponseEntity<>("Insufficient stock", HttpStatus.BAD_REQUEST);
+            try {
+                notificationService.sendLowStockAlert((List<InventoryItems>) item);
+                return new ResponseEntity<>("Insufficient stock", HttpStatus.BAD_REQUEST);
             }
+            catch (Exception e){
+                throw new RuntimeException("Error in sending low stock alert");
+            }
+            }
+
 
         else{
             return new ResponseEntity<String>("Item not found",HttpStatus.BAD_REQUEST);

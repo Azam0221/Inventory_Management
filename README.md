@@ -2,9 +2,9 @@
 
 A backend application built with **Spring Boot** for comprehensive inventory management. Designed for use by **Admins, Staff, and Managers**, it enables efficient management of products, suppliers, inventory, and transaction records. Features include product addition, supplier management, inventory creation, purchase and sale order processing, transaction logging, and email notifications.
 
----
+------------------------------------
 
-## 🚀 Features
+## Features
 
 - **Role-Based Access:** Admin, staff, and manager roles with appropriate access controls.
 - **Product Management:** Add, update, and manage products.
@@ -14,9 +14,9 @@ A backend application built with **Spring Boot** for comprehensive inventory man
 - **Transaction Logging:** Record every transaction type in the database.
 - **Email Service:** Automated email notifications using Spring and Google App Passwords.
 
----
+------------------------------------
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend:** Java and Spring Boot
 - **Database:**  MySQL

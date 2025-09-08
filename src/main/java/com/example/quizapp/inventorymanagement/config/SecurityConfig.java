@@ -43,7 +43,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/admin/login","/api/auth/staff/login","/api/auth/viewer/login").permitAll()
                         .requestMatchers("/api/auth/staff/register").permitAll()
-                        .requestMatchers("/api/auth/admin/register").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/auth/admin/register").permitAll()
                         .requestMatchers("/api/purchase-order/create").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/purchase-order/{id}/approve").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/api/purchase-order/{id}/receive").hasAuthority("ROLE_ADMIN")

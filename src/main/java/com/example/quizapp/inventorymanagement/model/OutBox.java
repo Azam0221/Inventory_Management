@@ -1,9 +1,11 @@
 package com.example.quizapp.inventorymanagement.model;
 
 
+import com.example.quizapp.inventorymanagement.enum_.Status;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 
@@ -23,10 +25,11 @@ public class OutBox {
     @Column(columnDefinition = "json")
     private String payLoad;
 
-    private String status = "PENDING";
+    private Status status = Status.PENDING;
     private Integer attempts;
 
+    private Instant createdAt;
+    private Instant lastProcessedAt;
 
-    private LocalDateTime createdAt = LocalDateTime.now();
 
 }

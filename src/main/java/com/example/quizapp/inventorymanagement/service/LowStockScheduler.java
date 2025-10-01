@@ -1,7 +1,9 @@
 package com.example.quizapp.inventorymanagement.service;
 
 
+import com.example.quizapp.inventorymanagement.StaticInventoryData;
 import com.example.quizapp.inventorymanagement.model.InventoryItems;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -23,12 +25,13 @@ public class LowStockScheduler {
     }
 
 
-    @Scheduled(cron = "0 0 8 ? * MON-FRI")
-    public void checkAndNotifyLowStock(){
-        List<InventoryItems> lowStockItems = inventoryService.getLowStockItems().getBody();
+    @Scheduled(fixedRate = 60000)
+    public void checkAndNotifyLowStock() throws JsonProcessingException {
+       // List<InventoryItems> lowStockItems = inventoryService.getLowStockItems().getBody();
+        List<InventoryItems> lowStockItems =  StaticInventoryData.getLowStockItems();
         assert lowStockItems != null;
-        if(!lowStockItems.isEmpty()){
+        //if(true){
            notificationService.sendLowStockAlert(lowStockItems);
-       }
+      // }
     }
 }

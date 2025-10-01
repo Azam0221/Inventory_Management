@@ -47,7 +47,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if(path.contains("/api/auth/staff/register")||
                 path.contains("/api/auth/viewer/login")||
                 path.contains("/api/auth/staff/login") ||
-                path.contains("/api/auth/admin/login")){
+                path.contains("/api/auth/admin/login") ||
+                path.contains("/api/auth/admin/register")){
             filterChain.doFilter(request,response);
             return;
         }

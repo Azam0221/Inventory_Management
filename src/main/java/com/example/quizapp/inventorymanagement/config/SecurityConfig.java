@@ -41,16 +41,17 @@ public class SecurityConfig {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/admin/login","/api/auth/staff/login","/api/auth/viewer/login").permitAll()
-                        .requestMatchers("/api/auth/staff/register").permitAll()
-                        .requestMatchers("/api/auth/admin/register").permitAll()
-                        .requestMatchers("/api/purchase-order/create").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/api/purchase-order/{id}/approve").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/api/purchase-order/{id}/receive").hasAuthority("ROLE_ADMIN")
-
+                        .requestMatchers(
+                                "/api/auth/admin/login",
+                                "/api/auth/staff/login",
+                                "/api/auth/viewer/login",
+                                "/api/auth/staff/register",
+                                "/api/auth/viewer/register",
+                                "/api/auth/admin/register",
+                                "/api/auth/register-brand"
+                        ).permitAll()
+                        .requestMatchers("/api/purchase-order/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())
-                        .formLogin(Customizer.withDefaults())
-                        .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 

@@ -2,6 +2,7 @@ package com.example.quizapp.inventorymanagement.config;
 
 
 
+import com.example.quizapp.inventorymanagement.context.TenantContext;
 import com.example.quizapp.inventorymanagement.model.AuthResponse;
 import com.example.quizapp.inventorymanagement.service.JwtService;
 import com.example.quizapp.inventorymanagement.service.MyUserDetailsService;
@@ -45,10 +46,9 @@ public class JwtFilter extends OncePerRequestFilter {
         System.out.println("Do Filter for path: " + request.getServletPath());
         String path = request.getServletPath();
         if(path.contains("/api/auth/staff/register")||
-                path.contains("/api/auth/viewer/login")||
-                path.contains("/api/auth/staff/login") ||
-                path.contains("/api/auth/admin/login") ||
-                path.contains("/api/auth/admin/register")){
+                path.contains("/api/auth/viewer/register")||
+                path.contains("/api/auth/admin/register")||
+                path.contains("/api/auth/register-brand")){
             filterChain.doFilter(request,response);
             return;
         }
@@ -56,13 +56,15 @@ public class JwtFilter extends OncePerRequestFilter {
         String authHeader = request.getHeader("Authorization");
         String token="";
         String email = "";
+        String tenantId = "";
 
         System.out.println("Checking for Authorization header");
-        if(authHeader != null && authHeader.startsWith("Bearer ")){
+        if(authHeader != null  && authHeader.startsWith("Bearer ")){
             System.out.println("Checking for auth passed");
             token = authHeader.substring(7);
             try {
                 email = jwtService.extractUserName(token);
+                tenantId = jwtService.extractTenantId(token);
                 System.out.println("EMAIL extracted: " + email);
             } catch (Exception e) {
                 System.out.println("Error extracting email from token: " + e.getMessage());
@@ -78,12 +80,15 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
 
-        if(email!=null && SecurityContextHolder.getContext().getAuthentication() == null){
+        if(email!=null && tenantId != null && SecurityContextHolder.getContext().getAuthentication() == null){
             try {
                 UserDetails userDetails = context.getBean(MyUserDetailsService.class).loadUserByUsername(email);
 
 
                 if (jwtService.validateToken(token, userDetails)) {
+
+                    TenantContext.setCurrentTenant(tenantId);
+
                     UsernamePasswordAuthenticationToken authtoken = new UsernamePasswordAuthenticationToken(
                             userDetails, null, userDetails.getAuthorities()
                     );
@@ -101,8 +106,13 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
         }
-        filterChain.doFilter(request,response);
 
+        try {
+            filterChain.doFilter(request,response);
+        }
+        finally {
+            TenantContext.clear();
+        }
 
     }
 

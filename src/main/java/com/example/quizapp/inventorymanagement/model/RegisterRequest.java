@@ -13,6 +13,9 @@ public class  RegisterRequest {
     @NotBlank(message = "Name is required")
     private String name;
 
+    @NotBlank(message = "Tenant name is required")
+    private String  tenantName;
+
     @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")
     private String email;

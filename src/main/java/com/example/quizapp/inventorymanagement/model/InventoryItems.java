@@ -22,4 +22,9 @@ public class InventoryItems {
     @ManyToOne
     @JoinColumn(name = "supplier_id")
     private Supplier supplier;
+
+
+    @ManyToOne(optional = false, fetch = FetchType.LAZY)
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
 }

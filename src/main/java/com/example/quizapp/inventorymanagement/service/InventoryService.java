@@ -1,10 +1,12 @@
 package com.example.quizapp.inventorymanagement.service;
 
 
+import com.example.quizapp.inventorymanagement.context.TenantContext;
 import com.example.quizapp.inventorymanagement.enum_.Type;
 import com.example.quizapp.inventorymanagement.model.*;
 import com.example.quizapp.inventorymanagement.repository.InventoryItemRepository;
 import com.example.quizapp.inventorymanagement.repository.ProductRepository;
+import com.example.quizapp.inventorymanagement.repository.TenantRepository;
 import com.example.quizapp.inventorymanagement.repository.UserRepository;
 import com.example.quizapp.inventorymanagement.specification.InventorySpecification;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class InventoryService {
@@ -39,8 +42,28 @@ public class InventoryService {
     @Autowired
     NotificationService notificationService;
 
+    @Autowired
+    TenantRepository tenantRepository;
 
-    public void addInventoryItems(List<InventoryItems> inventoryItemsList){
+
+    public ResponseEntity<String> addInventoryItems(List<InventoryItems> inventoryItemsList){
+
+        String tenantId = TenantContext.getCurrentTenant();
+
+
+        if (tenantId == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tenant ID is missing from the request context.");
+        }
+
+        Tenant existingTenant = tenantRepository.findById(UUID.fromString(tenantId))
+                .orElseThrow(() -> new RuntimeException("Tenant not found!"));
+
+        if (existingTenant == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("The specified tenant does not exist.");
+        }
+
+        inventoryItemsList.forEach(inventoryItems -> inventoryItems.setTenant(existingTenant));
+
         inventoryItemRepo.saveAll(inventoryItemsList);
 
         User currentUser = userRepository.findByEmail(
@@ -63,7 +86,7 @@ public class InventoryService {
             );
         }
 
-        System.out.println("Success");
+        return ResponseEntity.ok("Inventory item added");
     }
 
     public ResponseEntity<List<InventoryItems>> getInventoryItems(){

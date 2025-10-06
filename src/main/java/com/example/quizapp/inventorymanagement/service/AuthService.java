@@ -47,7 +47,6 @@ public class AuthService {
     public ResponseEntity<AuthResponse> registerBrand(RegisterRequest request){
         String accessToken = "";
         String refreshToken = "";
-        String tenantId = "";
 
         if(userRepo.existsByEmail(request.getEmail())){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
@@ -129,7 +128,7 @@ public class AuthService {
         String accessToken ="";
         String refreshToken ="";
         String tenantId = "";
-
+        System.out.println("User found: " + user);
         Authentication authentication =
                 authManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword()));
 

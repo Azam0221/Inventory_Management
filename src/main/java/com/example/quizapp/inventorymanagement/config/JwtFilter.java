@@ -45,9 +45,8 @@ public class JwtFilter extends OncePerRequestFilter {
 
         System.out.println("Do Filter for path: " + request.getServletPath());
         String path = request.getServletPath();
-        if(path.contains("/api/auth/staff/register")||
-                path.contains("/api/auth/viewer/register")||
-                path.contains("/api/auth/admin/register")||
+           if(
+                path.contains("/api/auth/login")||
                 path.contains("/api/auth/register-brand")){
             filterChain.doFilter(request,response);
             return;

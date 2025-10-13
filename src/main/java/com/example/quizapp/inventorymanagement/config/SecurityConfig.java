@@ -46,7 +46,8 @@ public class SecurityConfig {
                                 "/api/auth/staff/register",
                                 "/api/auth/viewer/register",
                                 "/api/auth/admin/register",
-                                "/api/auth/register-brand"
+                                "/api/auth/register-brand",
+                                "/custom"
                         ).permitAll()
                         .requestMatchers("/api/purchase-order/**").hasAuthority("ROLE_ADMIN")
                         .anyRequest().authenticated())

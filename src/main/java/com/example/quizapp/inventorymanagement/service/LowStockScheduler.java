@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 
 @Service
@@ -28,7 +29,7 @@ public class LowStockScheduler {
     @Scheduled(fixedRate = 60000)
     public void checkAndNotifyLowStock() throws JsonProcessingException {
        // List<InventoryItems> lowStockItems = inventoryService.getLowStockItems().getBody();
-        List<InventoryItems> lowStockItems =  StaticInventoryData.getLowStockItems();
+        List<InventoryItems> lowStockItems =  Collections.emptyList();// StaticInventoryData.getLowStockItems();
         assert lowStockItems != null;
         //if(true){
            notificationService.sendLowStockAlert(lowStockItems);

@@ -1,6 +1,5 @@
 package com.example.quizapp.inventorymanagement.model;
 
-
 import com.example.quizapp.inventorymanagement.enum_.Role;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -8,13 +7,11 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class  RegisterRequest {
+public class StaffRegisterRequest {
+
 
     @NotBlank(message = "Name is required")
     private String name;
-
-    @NotBlank(message = "Tenant name is required")
-    private String  tenantName;
 
     @Email(message = "Invalid email")
     @NotBlank(message = "Email is required")
@@ -25,3 +22,4 @@ public class  RegisterRequest {
 
     private Role role;
 }
+ 

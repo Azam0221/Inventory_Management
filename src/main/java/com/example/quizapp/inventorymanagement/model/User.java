@@ -33,4 +33,8 @@ public class User {
        inverseJoinColumns = @JoinColumn(name = "responsibility_id")
     )
     private Set<Responsibility> responsibilities;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "tenant_id")
+    private Tenant tenant;
 }

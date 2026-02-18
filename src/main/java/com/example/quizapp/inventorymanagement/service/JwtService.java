@@ -34,18 +34,19 @@ public class JwtService {
         }
     }
 
-    public String generateAcesssToken(String email,Role role){
+    public String generateAcesssToken(String email,Role role,String tenantId){
 
-        return getString(email, role, ACCESS_TOKEN_EXPIRY);
+        return getString(email, role, ACCESS_TOKEN_EXPIRY,tenantId);
     }
 
-    public String generateRefreshToken(String email, Role role){
-        return getString(email, role, REFRESH_TOKEN_EXPIRY);
+    public String generateRefreshToken(String email, Role role,String tenantId){
+        return getString(email, role, REFRESH_TOKEN_EXPIRY,tenantId);
     }
 
-    private String getString(String email, Role role, Long refreshTokenExpiry) {
+    private String getString(String email, Role role, Long refreshTokenExpiry,String tenantId) {
         Map<String, Object> claims = new HashMap<>();
         claims.put("role",role.name());
+        claims.put("tenantId",tenantId);
         return Jwts.builder()
                 .claims()
                 .add(claims)
@@ -64,6 +65,10 @@ public class JwtService {
 
     public String extractUserName(String token) {
         return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractTenantId(String token){
+        return  extractClaim(token,claims -> claims.get("tenantId",String.class));
     }
 
     public <T> T extractClaim(String token, Function<Claims,T> claimsResolver){

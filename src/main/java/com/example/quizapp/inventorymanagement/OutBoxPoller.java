@@ -25,7 +25,7 @@ public class OutBoxPoller {
 
     @Scheduled(fixedDelayString = "${outbox.poll.interval.ms:500}")
     public void pollAndPublish(){
-        List<OutBox> pending = outBoxRepository.findTop100ByStatusOrderByCreatedAtAsc(Status.PENDING);
+        List<OutBox> pending = outBoxRepository.findPendingEventsForProcessing();
 
         for(OutBox outBox : pending){
             try {
